@@ -6,7 +6,7 @@ import ssl
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall.mp4')
+VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall-compressed.mp4')
 ffmpegs = [[], []]
 
 #ssl for the server, I'm not using it right now though since I'm just doing localhost and no need for it.
