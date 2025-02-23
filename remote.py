@@ -13,9 +13,16 @@ ffmpegs = [[], []]
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 context.load_cert_chain('certificate.crt', keyfile='private.key')
 
+@app.route('/')
+def send_homepage():
+  return send_from_directory('public', "index.html")
+
 @app.route('/<path:path>')
 def send_static(path):
-  return send_from_directory('public', path)
+  if not "." in path:
+    return send_from_directory('public/' + str(path), "index.html")
+  else:
+    return send_from_directory('public', path)
 
 @socketio.on('connect')
 def handle_connect():
