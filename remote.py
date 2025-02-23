@@ -10,8 +10,8 @@ VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall-compressed.mp4')
 ffmpegs = [[], []]
 
 #ssl for the server, I'm not using it right now though since I'm just doing localhost and no need for it.
-context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-context.load_cert_chain('certificate.crt', keyfile='private.key')
+#context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+#context.load_cert_chain('certificate.crt', keyfile='private.key')
 
 @app.route('/')
 def send_homepage():
