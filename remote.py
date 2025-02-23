@@ -49,7 +49,7 @@ def handle_data_message(message):
     client_resolution = f"{width}x{height}"
 
     ffmpeg_process = subprocess.Popen(
-      ['C:\\FFmpeg\\bin\\ffmpeg.exe', '-re', '-i', VIDEO_PATH, '-f', 'webm', '-vcodec', 'libvpx-vp9',
+      ['ffmpeg', '-re', '-i', VIDEO_PATH, '-f', 'webm', '-vcodec', 'libvpx-vp9',
        '-acodec', 'libvorbis', '-preset', 'ultrafast', '-deadline', 'realtime',
        '-cpu-used', '8', '-speed', '16', '-threads', '8', '-s', client_resolution, '-'],
       stdout=subprocess.PIPE, stderr=subprocess.PIPE
