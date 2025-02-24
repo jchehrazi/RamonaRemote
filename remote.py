@@ -2,6 +2,7 @@ import os
 import subprocess
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit
+import imageio_ffmpeg as ioffmpeg
 import ssl
 
 app = Flask(__name__)
@@ -49,7 +50,7 @@ def handle_data_message(message):
     client_resolution = f"{width}x{height}"
 
     ffmpeg_process = subprocess.Popen(
-      ['ffmpeg', '-re', '-i', VIDEO_PATH, '-f', 'webm', '-vcodec', 'libvpx-vp9',
+      [ioffmpeg.get_ffmpeg.exe(), '-re', '-i', VIDEO_PATH, '-f', 'webm', '-vcodec', 'libvpx-vp9',
        '-acodec', 'libvorbis', '-preset', 'ultrafast', '-deadline', 'realtime',
        '-cpu-used', '8', '-speed', '16', '-threads', '8', '-s', client_resolution, '-'],
       stdout=subprocess.PIPE, stderr=subprocess.PIPE
