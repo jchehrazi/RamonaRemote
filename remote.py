@@ -3,11 +3,13 @@ import subprocess
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit
 import imageio_ffmpeg as ioffmpeg
+from engineio.payload import Payload
 import ssl
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall-compressed.mp4')
+Payload.max_decode_packets = 50
 ffmpegs = [[], []]
 
 #ssl for the server, I'm not using it right now though since I'm just doing localhost and no need for it.
