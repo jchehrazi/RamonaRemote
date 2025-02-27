@@ -164,14 +164,44 @@
         socket.emit('data-message', data);
       }
 
+      let throttleTimeout;
+
       video.addEventListener("wheel", function(e) {
-        const bounds = e.target.getBoundingClientRect();
-        const location = [e.clientX - bounds.left, e.clientY - bounds.top];
-        if (e.deltaY > 0) {
-          sendData("scroll zoom out | Location: " + location);
-        } else {
-          sendData("scroll zoom in | Location: " + location);
+        if (!throttleTimeout) {
+          throttleTimeout = setTimeout(() => {
+            const bounds = e.target.getBoundingClientRect();
+            const location = [e.clientX - bounds.left, e.clientY - bounds.top];
+            if (e.deltaY > 0) {
+              sendData("scroll zoom out | Location: " + location);
+            } else {
+              sendData("scroll zoom in | Location: " + location);
+            }
+            throttleTimeout = null;
+          }, 200);
         }
+      });
+
+      let isDragging = false;
+      let prevLocation = [0,0]
+      video.addEventListener("mousedown", (event) => {
+        const bounds = event.target.getBoundingClientRect();
+        isDragging = true;
+        prevLocation = [event.clientX - bounds.left, event.clientY - bounds.top]
+      });
+
+      video.addEventListener("mousemove", (event) => {
+        const bounds = event.target.getBoundingClientRect();
+        const location = [event.clientX - bounds.left, event.clientY - bounds.top];
+        const valChange = [Math.abs(parseInt(location[0]) - parseInt(prevLocation[0])), Math.abs(parseInt(location[1]) - parseInt(prevLocation[1]))]
+        if (isDragging && (valChange[0] > 2 || valChange[1] > 2)) {
+          sendData("pan/drag | Location: " + location);
+          prevLocation = location;
+        }
+        console.log("pan/drag | Location: " + Math.abs(parseInt(location[0]) - parseInt(prevLocation[0])));
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
       });
 
       sendData("{clientData-resolution=" + (video.getBoundingClientRect().width * window.devicePixelRatio) + "}")
