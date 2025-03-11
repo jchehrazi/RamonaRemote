@@ -137,7 +137,9 @@
       video.src = URL.createObjectURL(mediaSource);
 
       mediaSource.addEventListener('sourceopen', () => {
-        const sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp9, vorbis"');
+        const sourceBuffer = mediaSource.addSourceBuffer(
+          'video/webm; codecs="vp9"'
+        );
         const queue = [];
         let isAppending = false;
 
