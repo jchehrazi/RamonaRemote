@@ -2,8 +2,10 @@ import os
 import subprocess
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit
+import imageio
 import imageio_ffmpeg as ioffmpeg
 from engineio.payload import Payload
+from time import sleep
 import ssl
 
 app = Flask(__name__)
@@ -51,18 +53,46 @@ def handle_data_message(message):
     height = int(width * 9 / 16)
     client_resolution = f"{width}x{height}"
 
+    # Simulate a frame...
+    frame = imageio.imread('imageio:astronaut.png')
+
+    sizestr = f"{frame.shape[1]}x{frame.shape[0]}"
     ffmpeg_process = subprocess.Popen(
-      [ioffmpeg.get_ffmpeg_exe(), '-re', '-i', VIDEO_PATH, '-f', 'webm', '-vcodec', 'libvpx-vp9',
-       '-an', '-preset', 'ultrafast', '-deadline', 'realtime',
-       '-cpu-used', '8', '-speed', '16', '-threads', '8', '-s', client_resolution, '-'],
-      stdout=subprocess.PIPE, stderr=subprocess.PIPE
+      [
+          ioffmpeg.get_ffmpeg_exe(),
+          '-hide_banner',
+          '-loglevel', 'error',
+          '-f', 'rawvideo',
+          '-pix_fmt', 'rgb24',
+          '-s', sizestr,
+          '-r', '1',
+          '-i', 'pipe:',
+          '-vcodec', 'libvpx-vp9',
+          '-an',
+          '-preset', 'ultrafast',
+          '-deadline', 'realtime',
+          '-cpu-used', '8',
+          '-speed', '16',
+          '-threads', '8',
+          '-f', 'webm',
+          '-s', client_resolution, '-'
+      ],
+      stdin=subprocess.PIPE,
+      stdout=subprocess.PIPE,
+      stderr=subprocess.PIPE
     )
 
     ffmpegs[0].append(request.sid)
     ffmpegs[1].append(ffmpeg_process)
     print(ffmpegs)
 
+    # Write data to the FFmpeg process
+    for factor in (1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1):
+      ffmpeg_process.stdin.write((frame * factor).astype('uint8').tobytes())
+    # Now terminate the input stream
+    ffmpeg_process.stdin.close()
     while True:
+      # Timeout after 0.1 seconds
       data = ffmpeg_process.stdout.read(1024)
       if not data:
         break
