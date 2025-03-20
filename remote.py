@@ -10,7 +10,7 @@ import ssl
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall-compressed.mp4')
+#VIDEO_PATH = os.path.join(os.getcwd(), 'waterfall-compressed.mp4')
 Payload.max_decode_packets = 50
 ffmpegs = [[], []]
 
